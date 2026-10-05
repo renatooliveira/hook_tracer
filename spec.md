@@ -75,6 +75,7 @@ def make_wrapper(name, kind, original):
         finally:
             safe_record(name, kind, callbacks, args, result, error, start)
         return result
+
     return traced
 ```
 
@@ -121,7 +122,7 @@ Settings live in the add-on's `config.json`, documented in `config.md`, and are 
 | `capture_args` | `true` | Store argument summaries; off records names and timings only |
 | `repr_max_len` | `200` | Truncation length for each argument repr |
 | `muted_hooks` | `[]` | Hook names never recorded |
-| `trace_legacy` | `false` | Also record `runHook` and `runFilter` calls (milestone 5) |
+| `trace_legacy` | `false` | Reserved for optional `runHook`/`runFilter` tracing (milestone 6); disabled in v1 |
 
 The mute list is also editable from the panel, which writes back to the config.
 
@@ -187,6 +188,13 @@ Each milestone ends with something you can run, so you can stop after any of the
 4. **Detail, owners and catalog.** Detail pane with callback owners and filter diffs, plus the catalog tab.
 5. **Polish.** Config keys, mute list, JSON Lines export, error counter.
 6. **Stretch.** Per-callback timing, legacy `runHook`/`runFilter` tracing, a "record this action" button that captures only the events between two clicks.
+
+**Phase 0 scope decision:** explicit legacy tracing belongs to milestone 6, not
+milestone 5. In v1, `trace_legacy` is reserved and defaults to `false`; a `true`
+value must be treated as unsupported, left disabled, and explained to the user.
+Generated hooks still execute their original legacy delegation unchanged, and
+that work remains included in the enclosing generated dispatch duration. Separate
+legacy events are deferred.
 
 ## Open questions
 

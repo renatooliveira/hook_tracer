@@ -9,7 +9,7 @@ Source: `spec.md`. Tasks are ordered by dependency and grouped by its milestones
 - [x] Determine whether GUI-hook discovery tests require a `QApplication` fixture.
 - [x] Scaffold `hook_tracer/core/`, `hook_tracer/ui/`, `tests/`, and the add-on manifest.
 - [x] Set up `uv` or a venv, `pytest`, `mypy`, and `ruff`; document development and check commands.
-- [ ] Resolve the legacy-tracing scope discrepancy: configuration mentions milestone 5, but the milestone list places implementation in stretch. Keep it disabled until implemented.
+- [x] Resolve the legacy-tracing scope discrepancy: explicit legacy tracing is milestone 6 stretch; `trace_legacy` stays disabled in v1 (see scope decision in `spec.md`).
 
 ## 1. Headless core
 
@@ -108,7 +108,7 @@ Source: `spec.md`. Tasks are ordered by dependency and grouped by its milestones
 ## 5. Polish and v1 validation
 
 - [ ] Ship `config.json` defaults and `config.md` documentation for `trace_on_startup`, `buffer_size`, `capture_args`, `repr_max_len`, `muted_hooks`, and `trace_legacy`.
-- [ ] Validate config types/ranges and document when changes take effect through Anki's add-on config dialog.
+- [ ] Validate config types/ranges and document when changes take effect through Anki's add-on config dialog; explain that `trace_legacy=true` is unsupported and keep legacy tracing disabled in v1.
 - [ ] Add selected-hook mute/unmute controls and persist changes back to config.
 - [ ] Display the internal recording-error counter in the panel.
 - [ ] Export a snapshot of the current buffer as JSON Lines, not just visible filtered rows.
