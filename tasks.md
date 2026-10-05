@@ -5,7 +5,7 @@ Source: `spec.md`. Tasks are ordered by dependency and grouped by its milestones
 ## 0. Resolve prerequisites and scaffold
 
 - [x] Choose the supported Anki version range and pin `anki`/`aqt` to the initial target version.
-- [ ] Verify generated hook/filter class layout on supported versions, including exception removal and legacy dispatch behavior.
+- [x] Verify generated hook/filter class layout on supported versions, including exception removal and legacy dispatch behavior.
 - [ ] Determine whether GUI-hook discovery tests require a `QApplication` fixture.
 - [ ] Scaffold `hook_tracer/core/`, `hook_tracer/ui/`, `tests/`, and the add-on manifest.
 - [ ] Set up `uv` or a venv, `pytest`, `mypy`, and `ruff`; document development and check commands.
