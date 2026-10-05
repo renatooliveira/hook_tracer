@@ -15,41 +15,41 @@ Source: `spec.md`. Tasks are ordered by dependency and grouped by its milestones
 
 ### Discovery — `hook_tracer/core/discovery.py`
 
-- [ ] Discover generated instances in supplied modules using `append`, `remove`, `count`, `_hooks`, and the class-name convention.
-- [ ] Classify hooks versus filters and assign stable names with `gui` or `anki` prefixes.
-- [ ] Deduplicate by class across modules and re-exports.
-- [ ] Test valid hooks/filters, unrelated objects, and duplicate exports without Qt imports.
+- [x] Discover generated instances in supplied modules using `append`, `remove`, `count`, `_hooks`, and the class-name convention.
+- [x] Classify hooks versus filters and assign stable names with `gui` or `anki` prefixes.
+- [x] Deduplicate by class across modules and re-exports.
+- [x] Test valid hooks/filters, unrelated objects, and duplicate exports without Qt imports.
 
 ### Recorder — `hook_tracer/core/recorder.py`
 
-- [ ] Define the frozen `TraceEvent` with all specified fields: sequence, elapsed time, hook, kind, thread, duration, callbacks, args, filter input/output, changed flag, and error.
-- [ ] Implement bounded `deque(maxlen=buffer_size)` storage, monotonically increasing sequence IDs, incremental reads, snapshots, and clear.
-- [ ] Make sequence allocation and buffer reads/writes safe under concurrent recording; keep Qt out of the core.
-- [ ] Implement bounded `reprlib.Repr` summaries, one-line display data, and `capture_args` support.
-- [ ] Capture filter input before dispatch and output after dispatch; implement the specified identity-and-inequality changed rule safely.
-- [ ] Store only serialized metadata, never live arguments, callbacks, results, exceptions, or tracebacks.
-- [ ] Add a recording-error counter and protect against failing reprs, comparisons, and serialization.
-- [ ] Test eviction, sequence ordering, clear/incremental-read behavior, truncation, disabled argument capture, filter results, and lack of object retention.
+- [x] Define the frozen `TraceEvent` with all specified fields: sequence, elapsed time, hook, kind, thread, duration, callbacks, args, filter input/output, changed flag, and error.
+- [x] Implement bounded `deque(maxlen=buffer_size)` storage, monotonically increasing sequence IDs, incremental reads, snapshots, and clear.
+- [x] Make sequence allocation and buffer reads/writes safe under concurrent recording; keep Qt out of the core.
+- [x] Implement bounded `reprlib.Repr` summaries, one-line display data, and `capture_args` support.
+- [x] Capture filter input before dispatch and output after dispatch; implement the specified identity-and-inequality changed rule safely.
+- [x] Store only serialized metadata, never live arguments, callbacks, results, exceptions, or tracebacks.
+- [x] Add a recording-error counter and protect against failing reprs, comparisons, and serialization.
+- [x] Test eviction, sequence ordering, clear/incremental-read behavior, truncation, disabled argument capture, filter results, and lack of object retention.
 
 ### Patching — `hook_tracer/core/patching.py`
 
-- [ ] Install class-level `__call__` wrappers and retain exact originals in an idempotent registry.
-- [ ] Add recording state, muted-hook checks, and the cheap paused path directly to the original dispatch.
-- [ ] Snapshot callbacks before dispatch and measure total dispatch duration with `perf_counter_ns`.
-- [ ] Preserve return values, callback ordering, filter chaining, removal-on-error, and original exceptions unchanged.
-- [ ] Isolate all tracer bookkeeping failures so they cannot prevent dispatch or replace its exception; increment the error counter when recording fails.
-- [ ] Add a thread-local re-entrancy guard for recorder activity and expose a guard for tracer-owned UI activity.
-- [ ] Restore exact original callables on uninstall; test repeated install/uninstall.
+- [x] Install class-level `__call__` wrappers and retain exact originals in an idempotent registry.
+- [x] Add recording state, muted-hook checks, and the cheap paused path directly to the original dispatch.
+- [x] Snapshot callbacks before dispatch and measure total dispatch duration with `perf_counter_ns`.
+- [x] Preserve return values, callback ordering, filter chaining, removal-on-error, and original exceptions unchanged.
+- [x] Isolate all tracer bookkeeping failures so they cannot prevent dispatch or replace its exception; increment the error counter when recording fails.
+- [x] Add a thread-local re-entrancy guard for recorder activity and expose a guard for tracer-owned UI activity.
+- [x] Restore exact original callables on uninstall; test repeated install/uninstall.
 
 ### Headless verification — `tests/`
 
-- [ ] Build `fake_hooks.py` matching generated hook/filter dispatch, callback removal, and legacy delegation.
-- [ ] Test every fire, callback snapshots, filters, muted/paused recording, nesting, and guard cleanup after failure.
-- [ ] Inject recorder failures and assert original results and exceptions remain unchanged.
-- [ ] Fire hooks from multiple threads and verify event counts, unique sequence IDs, and thread names.
-- [ ] Add real `anki.hooks` integration tests with a temporary `Collection` and an action such as adding a note; always clean up patches and collections.
-- [ ] Add a runnable headless script that prints a trace of adding a note.
-- [ ] Add a `timeit` comparison of unpatched versus paused-patched dispatch with a loose, non-flaky threshold.
+- [x] Build `fake_hooks.py` matching generated hook/filter dispatch, callback removal, and legacy delegation.
+- [x] Test every fire, callback snapshots, filters, muted/paused recording, nesting, and guard cleanup after failure.
+- [x] Inject recorder failures and assert original results and exceptions remain unchanged.
+- [x] Fire hooks from multiple threads and verify event counts, unique sequence IDs, and thread names.
+- [x] Add real `anki.hooks` integration tests with a temporary `Collection` and an action such as adding a note; always clean up patches and collections.
+- [x] Add a runnable headless script that prints a trace of adding a note.
+- [x] Add a `timeit` comparison of unpatched versus paused-patched dispatch with a loose, non-flaky threshold.
 
 **Exit check:** headless tests pass, the example prints real pylib events, and core modules import without Qt.
 
