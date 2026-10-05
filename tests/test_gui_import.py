@@ -9,7 +9,10 @@ import unittest
 class GuiImportTests(unittest.TestCase):
     def test_discovery_needs_no_qapplication(self):
         result = subprocess.run(
-            [sys.executable, "-c", """
+            [
+                sys.executable,
+                "-c",
+                """
 import anki.collection
 import aqt.gui_hooks as hooks
 from aqt.qt import QApplication
@@ -25,7 +28,8 @@ assert 'card_will_show' in found
 assert 'reviewer_did_answer_card' in found
 assert QApplication.instance() is None
 print(len(found))
-"""],
+""",
+            ],
             env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
             capture_output=True,
             text=True,

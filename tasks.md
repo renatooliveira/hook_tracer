@@ -8,7 +8,7 @@ Source: `spec.md`. Tasks are ordered by dependency and grouped by its milestones
 - [x] Verify generated hook/filter class layout on supported versions, including exception removal and legacy dispatch behavior.
 - [x] Determine whether GUI-hook discovery tests require a `QApplication` fixture.
 - [x] Scaffold `hook_tracer/core/`, `hook_tracer/ui/`, `tests/`, and the add-on manifest.
-- [ ] Set up `uv` or a venv, `pytest`, `mypy`, and `ruff`; document development and check commands.
+- [x] Set up `uv` or a venv, `pytest`, `mypy`, and `ruff`; document development and check commands.
 - [ ] Resolve the legacy-tracing scope discrepancy: configuration mentions milestone 5, but the milestone list places implementation in stretch. Keep it disabled until implemented.
 
 ## 1. Headless core

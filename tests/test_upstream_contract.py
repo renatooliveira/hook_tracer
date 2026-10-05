@@ -41,15 +41,16 @@ class UpstreamContractTests(unittest.TestCase):
         calls = []
         with (
             patch.object(type(hook), "_hooks", [lambda value: calls.append("new")]),
-            patch.object(anki.hooks, "_hooks", {"exportersList": [lambda value: calls.append("legacy")]}),
+            patch.object(
+                anki.hooks, "_hooks", {"exportersList": [lambda value: calls.append("legacy")]}
+            ),
         ):
             hook([])
         self.assertEqual(calls, ["new", "legacy"])
 
     def test_generated_filters_thread_the_first_argument(self):
         hook = next(
-            obj for obj in vars(anki.hooks).values()
-            if type(obj).__name__.endswith("Filter")
+            obj for obj in vars(anki.hooks).values() if type(obj).__name__.endswith("Filter")
         )
         with patch.object(type(hook), "_hooks", []):
             hook.append(lambda value, *args: value + "a")
