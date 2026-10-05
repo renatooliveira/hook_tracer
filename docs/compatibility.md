@@ -28,3 +28,13 @@ Legacy calls run after generated callbacks: `exporters_list_created` delegates t
 Import `anki.collection` before `anki.hooks` in standalone probes: importing hooks
 first in this release exposes an upstream circular import. Run the initial
 contract probes with `uv run python -m unittest discover -s tests -v`.
+
+## GUI discovery without an application
+
+On the development macOS arm64 environment, importing `aqt.gui_hooks` after
+`anki.collection` discovers 150 generated instances without creating a
+`QApplication`. The subprocess regression probe uses `QT_QPA_PLATFORM=offscreen`
+and checks the application is still absent after discovery. Qt libraries must
+be installed, but GUI discovery needs no application fixture on this target.
+Actual widget/model tests in phase 3 will need a Qt application fixture. Other
+platforms still require validation; this is not a cross-platform runtime claim.

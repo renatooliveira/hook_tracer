@@ -6,7 +6,7 @@ Source: `spec.md`. Tasks are ordered by dependency and grouped by its milestones
 
 - [x] Choose the supported Anki version range and pin `anki`/`aqt` to the initial target version.
 - [x] Verify generated hook/filter class layout on supported versions, including exception removal and legacy dispatch behavior.
-- [ ] Determine whether GUI-hook discovery tests require a `QApplication` fixture.
+- [x] Determine whether GUI-hook discovery tests require a `QApplication` fixture.
 - [ ] Scaffold `hook_tracer/core/`, `hook_tracer/ui/`, `tests/`, and the add-on manifest.
 - [ ] Set up `uv` or a venv, `pytest`, `mypy`, and `ruff`; document development and check commands.
 - [ ] Resolve the legacy-tracing scope discrepancy: configuration mentions milestone 5, but the milestone list places implementation in stretch. Keep it disabled until implemented.
