@@ -48,11 +48,6 @@ class Controller:
             self.hooks = discover([("anki", anki.hooks), ("gui", gui_hooks)])
             self.patcher.install(self.hooks)
             with self.patcher.suppress():
-                self.action = QAction("Hook Tracer: Record", mw)
-                self.action.setCheckable(True)
-                self.action.setChecked(self.patcher.recording)
-                self.action.toggled.connect(self.set_recording)
-                mw.form.menuTools.addAction(self.action)
                 self.open_action = QAction("Hook Tracer", mw)
                 self.open_action.triggered.connect(self.open_panel)
                 mw.form.menuTools.addAction(self.open_action)
@@ -65,7 +60,6 @@ class Controller:
     def set_recording(self, value: bool) -> None:
         with self.patcher.suppress():
             self.patcher.recording = value
-            self.action.setChecked(value)
 
     def open_panel(self) -> None:
         from aqt.qt import Qt
@@ -139,9 +133,7 @@ class Controller:
             if self._dock is not None:
                 self._dock.shutdown()
                 self._dock = None
-            self.mw.form.menuTools.removeAction(self.action)
             self.mw.form.menuTools.removeAction(self.open_action)
-            self.action.deleteLater()
             self.open_action.deleteLater()
             self.patcher.recording = False
             self.patcher.uninstall()

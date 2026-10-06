@@ -55,8 +55,8 @@ class StreamDock(QDockWidget):
         content = QWidget(self.tabs)
         layout = QVBoxLayout(content)
         controls = QHBoxLayout()
-        self.pause = QPushButton(content)
-        self.pause.clicked.connect(self._toggle_recording)
+        self.record_button = QPushButton(content)
+        self.record_button.clicked.connect(self._toggle_recording)
         self.clear = QPushButton("Clear", content)
         self.clear.clicked.connect(self._clear)
         self.search = QLineEdit(content)
@@ -66,7 +66,7 @@ class StreamDock(QDockWidget):
         self.regex.toggled.connect(self._filter_changed)
         self.hide_empty = QCheckBox("Hide no callbacks", content)
         self.hide_empty.toggled.connect(self._filter_changed)
-        for widget in (self.pause, self.clear, self.search, self.regex, self.hide_empty):
+        for widget in (self.record_button, self.clear, self.search, self.regex, self.hide_empty):
             controls.addWidget(widget)
         layout.addLayout(controls)
         self.filter_message = QLabel(content)
@@ -123,7 +123,9 @@ class StreamDock(QDockWidget):
         self.visibilityChanged.connect(self._visibility_changed)
 
     def _sync_recording(self) -> None:
-        self.pause.setText("Pause" if self.patcher.recording else "Resume")
+        self.record_button.setText(
+            "Stop recording" if self.patcher.recording else "Start recording"
+        )
 
     def _sync_mutes(self) -> None:
         previous = self.muted.currentText()

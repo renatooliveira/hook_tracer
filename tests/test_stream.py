@@ -94,8 +94,9 @@ assert 'gui.after_clear' in p.muted
 assert dock.muted.count() == 1
 dock.unmute.click()
 assert not p.muted
-dock.pause.click()
+dock.record_button.click()
 assert not p.recording
+assert dock.record_button.text() == 'Start recording'
 dock.regex.setChecked(True)
 dock.search.setText('[')
 assert dock.filter_message.text().startswith('Invalid regex')

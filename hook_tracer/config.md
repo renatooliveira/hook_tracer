@@ -1,10 +1,10 @@
 # Hook Tracer settings
 
-Edit through Anki's **Tools > Add-ons > Hook Tracer > Config**. Restart Anki (or stop and start the tracer) to apply these settings; the panel's **Save mutes as default** button is the exception: it updates `muted_hooks` immediately and persists it for next launch. Merely muting or unmuting in the panel is session-only. Editing the config dialog while the tracer is running does not reconfigure the running recorder.
+Use **Tools > Hook Tracer** to open the panel and start/stop recording there. Edit settings through Anki's **Tools > Add-ons > Hook Tracer > Config**. Restart Anki (or stop and start the tracer) to apply these settings; the panel's **Save mutes as default** button is the exception: it updates `muted_hooks` immediately and persists it for next launch. Merely muting or unmuting in the panel is session-only. Editing the config dialog while the tracer is running does not reconfigure the running recorder.
 
 | Key | Default | Valid values | Meaning |
 | --- | --- | --- | --- |
-| `trace_on_startup` | `false` | boolean | Start recording when the add-on loads. Earlier Anki/add-on hooks cannot be captured. |
+| `trace_on_startup` | `false` | boolean | Advanced option: start recording when the add-on loads, before opening the panel. Earlier Anki/add-on hooks cannot be captured. |
 | `buffer_size` | `5000` | integer 1–100000 | Maximum number of events in memory; oldest are evicted. |
 | `capture_args` | `true` | boolean | Store bounded string summaries of arguments and filter values. |
 | `repr_max_len` | `200` | integer 1–10000 | Maximum characters per captured value's repr. |

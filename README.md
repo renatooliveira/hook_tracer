@@ -38,10 +38,12 @@ console (the add-ons directory is shared by profiles in that Anki installation):
 ln -s /absolute/path/to/hook_tracer/hook_tracer /path/to/Anki2/addons21/hook_tracer
 ```
 
-Restart Anki (use a disposable profile). **Tools > Hook Tracer: Record** toggles
-recording; it starts paused unless `trace_on_startup` is set to `true` in the
-add-on config. **Tools > Hook Tracer** opens the reusable live stream dock.
-Its Pause/Resume, Clear, hook-name substring/regex filter, and no-callbacks
+Restart Anki (use a disposable profile). **Tools > Hook Tracer** is the only
+menu entry; it opens the reusable live stream dock. Use **Start recording** or
+**Stop recording** inside the panel to control capture. Recording starts paused
+unless `trace_on_startup` is set to `true` in the add-on config, in which case
+startup events are captured before the panel opens. Closing the panel does not
+stop recording. Its Clear, hook-name substring/regex filter, and no-callbacks
 filter act on the buffered stream. Invalid regexes show an error instead of
 interrupting recording. A row's **Mute recording for selected hook** action
 stops new events for that hook from entering the buffer or debug console; use
