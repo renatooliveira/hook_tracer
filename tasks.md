@@ -73,6 +73,7 @@ Source: `spec.md`. Tasks are ordered by dependency and grouped by its milestones
 - [ ] Handle buffer eviction, missed refreshes, clear, and reopening without duplicate rows or unbounded model memory.
 - [ ] Highlight off-main-thread events; never touch widgets from dispatch threads.
 - [ ] Add pause/resume, clear, substring/regex name filtering, and “hide hooks with no callbacks.”
+- [ ] Add a quick **Mute recording for this hook** action from a stream row (including `gui.media_sync_did_progress` during media downloads), with visible session-muted state and an easy unmute path. Hiding from view alone must not be presented as protection against buffer eviction or console spam.
 - [ ] Handle invalid regex input without disrupting recording or the UI.
 - [ ] Guard tracer-owned UI work against recursive tracing and stop timers on teardown.
 - [ ] Test model updates/filtering with Qt fixtures where feasible.
@@ -109,7 +110,7 @@ Source: `spec.md`. Tasks are ordered by dependency and grouped by its milestones
 
 - [ ] Ship `config.json` defaults and `config.md` documentation for `trace_on_startup`, `buffer_size`, `capture_args`, `repr_max_len`, `muted_hooks`, and `trace_legacy`.
 - [ ] Validate config types/ranges and document when changes take effect through Anki's add-on config dialog; explain that `trace_legacy=true` is unsupported and keep legacy tracing disabled in v1.
-- [ ] Add selected-hook mute/unmute controls and persist changes back to config.
+- [ ] Add selected-hook mute/unmute controls and persist changes back to config when the user opts to keep a session mute across restarts; distinguish temporary session mutes from persisted mutes.
 - [ ] Display the internal recording-error counter in the panel.
 - [ ] Export a snapshot of the current buffer as JSON Lines, not just visible filtered rows.
 - [ ] Warn before export that arguments may contain card/note content; handle cancel and write failures safely.
@@ -131,4 +132,4 @@ Source: `spec.md`. Tasks are ordered by dependency and grouped by its milestones
 ## Deferred product decisions
 
 - [ ] Choose internal-team distribution, public AnkiWeb distribution, or integration into Anki's debug console. Public distribution remains outside v1.
-- [ ] Revisit default muted hooks using measured data rather than assumptions.
+- [ ] Revisit default muted hooks using measured data rather than assumptions. `gui.media_sync_did_progress` was reported flooding the phase-2 debug console during a large media download; measure frequency and buffer/console impact before proposing a default mute, and keep it discoverable when muted.

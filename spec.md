@@ -103,7 +103,7 @@ The UI is a `QDockWidget` on the main window, opened from **Tools > Hook Tracer*
 | Callbacks | Number registered at fire time |
 | Args | One-line summary of the arguments |
 
-Toolbar actions: pause/resume, clear, a filter box (substring or regex on hook name), "hide hooks with no callbacks", and mute/unmute the selected hook.
+Toolbar actions: pause/resume, clear, a filter box (substring or regex on hook name), "hide hooks with no callbacks", and mute/unmute the selected hook. Hiding is display-only; a quick **Mute recording for this hook** action also stops events from entering the ring buffer (and the temporary console feed), so high-frequency hooks cannot evict useful events. Make the muted state and unmute control visible even when the hook has no rows in the stream. Session mutes are temporary by default; offer an explicit option to persist them through the add-on config.
 
 **Detail pane**, below the table, for the selected event: full argument reprs, the callback list with each callback's qualified name and owning add-on, the filter's input and output with a changed flag, and the exception if a callback raised.
 
@@ -124,7 +124,7 @@ Settings live in the add-on's `config.json`, documented in `config.md`, and are 
 | `muted_hooks` | `[]` | Hook names never recorded |
 | `trace_legacy` | `false` | Reserved for optional `runHook`/`runFilter` tracing (milestone 6); disabled in v1 |
 
-The mute list is also editable from the panel, which writes back to the config.
+The persisted mute list is also editable from the panel. A temporary session mute does not write config unless the user explicitly chooses to keep it. Large media downloads can flood the phase-2 console with `gui.media_sync_did_progress`; measure its frequency and impact in a real session before making it a default mute. Muting must never disable Anki's hook dispatch itself.
 
 ## Performance and safety
 
