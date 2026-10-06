@@ -50,9 +50,11 @@ stops new events for that hook from entering the buffer or debug console; use
 the **Session mutes** dropdown to unmute even if no rows remain. Session mutes
 are temporary unless you click **Save mutes as default**; saved mutes apply
 immediately and on the next launch. A view filter, unlike muting, does not
-prevent buffer eviction or debug-console spam. Selecting a row shows stored
-argument reprs, callback owners, filter input/output and errors in the detail
-pane. The **View: Stream / Catalog** buttons switch views below the dock
+prevent buffer eviction or debug-console spam. Selecting a row opens a compact,
+draggable detail inspector with separate argument, callback, filter (if relevant)
+and error (if relevant) sections. **Copy details** copies only stored text;
+no live objects are expanded. The **View: Stream / Catalog** buttons switch
+views below the dock
 header (rather than native tabs, which overlap the title on macOS). The
 Catalog view lists discovered hooks, current registrations and
 session fire counts, sorted by callback count. Counts include attempted fires
