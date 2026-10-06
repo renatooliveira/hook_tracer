@@ -33,7 +33,12 @@ assert controller.patcher.recording
 assert type(anki.hooks.note_will_flush).__call__ is not original
 gui_hooks.main_window_did_init()
 assert 'gui.main_window_did_init' in [e.hook for e in controller.recorder.snapshot()]
-assert len(mw.form.menuTools.actions()) == 1
+assert len(mw.form.menuTools.actions()) == 2
+controller.open_action.trigger()
+assert controller._dock is not None
+first_dock = controller._dock
+controller.open_action.trigger()
+assert controller._dock is first_dock
 
 console = QDialog()
 console._log = QPlainTextEdit(console)
@@ -48,6 +53,7 @@ anki.hooks.note_will_flush('paused')
 assert len(controller.recorder.snapshot()) == before
 console.done(0)
 hook_tracer.stop()
+assert not first_dock.timer.isActive()
 assert not controller._timers
 assert len(mw.form.menuTools.actions()) == 0
 assert type(anki.hooks.note_will_flush).__call__ is original

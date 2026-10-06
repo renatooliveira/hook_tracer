@@ -27,6 +27,7 @@ class Controller:
         self._timers: list[QTimer] = []
         self._last_seq: dict[QTimer, int] = {}
         self._stopped = False
+        self._dock: Any = None
         # Config is read before installation and before any later startup hooks fire.
         config = mw.addonManager.getConfig(__name__) or {}
         self.patcher.recording = config.get("trace_on_startup") is True
@@ -38,6 +39,9 @@ class Controller:
                 self.action.setChecked(self.patcher.recording)
                 self.action.toggled.connect(self.set_recording)
                 mw.form.menuTools.addAction(self.action)
+                self.open_action = QAction("Hook Tracer", mw)
+                self.open_action.triggered.connect(self.open_panel)
+                mw.form.menuTools.addAction(self.open_action)
                 gui_hooks.debug_console_will_show.append(self._console_opened)
                 mw.app.aboutToQuit.connect(self.stop)
         except BaseException:
@@ -47,6 +51,19 @@ class Controller:
     def set_recording(self, value: bool) -> None:
         with self.patcher.suppress():
             self.patcher.recording = value
+            self.action.setChecked(value)
+
+    def open_panel(self) -> None:
+        from aqt.qt import Qt
+
+        from .ui.dock import StreamDock
+
+        with self.patcher.suppress():
+            if self._dock is None:
+                self._dock = StreamDock(self.mw, self.patcher, self.recorder, self.set_recording)
+                self.mw.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self._dock)
+            self._dock.show()
+            self._dock.raise_()
 
     def _console_opened(self, console: Any) -> None:
         """Temporary debug-console output until the phase 3 stream panel exists."""
@@ -89,8 +106,13 @@ class Controller:
             for timer in list(self._timers):
                 self._close_console(timer)
             gui_hooks.debug_console_will_show.remove(self._console_opened)
+            if self._dock is not None:
+                self._dock.shutdown()
+                self._dock = None
             self.mw.form.menuTools.removeAction(self.action)
+            self.mw.form.menuTools.removeAction(self.open_action)
             self.action.deleteLater()
+            self.open_action.deleteLater()
             self.patcher.recording = False
             self.patcher.uninstall()
             self.mw.app.aboutToQuit.disconnect(self.stop)

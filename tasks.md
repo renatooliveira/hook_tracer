@@ -67,16 +67,16 @@ Source: `spec.md`. Tasks are ordered by dependency and grouped by its milestones
 
 ## 3. Stream panel
 
-- [ ] Add **Tools > Hook Tracer** and a reusable `QDockWidget` in `ui/dock.py`.
-- [ ] Implement `ui/stream_model.py` with Time, Hook, Kind, Thread, Duration, Callbacks, and Args columns.
-- [ ] Refresh on a main-thread `QTimer` every 250 ms, reading events newer than the last sequence and using `beginInsertRows`.
-- [ ] Handle buffer eviction, missed refreshes, clear, and reopening without duplicate rows or unbounded model memory.
-- [ ] Highlight off-main-thread events; never touch widgets from dispatch threads.
-- [ ] Add pause/resume, clear, substring/regex name filtering, and “hide hooks with no callbacks.”
-- [ ] Add a quick **Mute recording for this hook** action from a stream row (including `gui.media_sync_did_progress` during media downloads), with visible session-muted state and an easy unmute path. Hiding from view alone must not be presented as protection against buffer eviction or console spam.
-- [ ] Handle invalid regex input without disrupting recording or the UI.
-- [ ] Guard tracer-owned UI work against recursive tracing and stop timers on teardown.
-- [ ] Test model updates/filtering with Qt fixtures where feasible.
+- [x] Add **Tools > Hook Tracer** and a reusable `QDockWidget` in `ui/dock.py`.
+- [x] Implement `ui/stream_model.py` with Time, Hook, Kind, Thread, Duration, Callbacks, and Args columns.
+- [x] Refresh on a main-thread `QTimer` every 250 ms, reading events newer than the last sequence and using `beginInsertRows`.
+- [x] Handle buffer eviction, missed refreshes, clear, and reopening without duplicate rows or unbounded model memory.
+- [x] Highlight off-main-thread events; never touch widgets from dispatch threads.
+- [x] Add pause/resume, clear, substring/regex name filtering, and “hide hooks with no callbacks.”
+- [x] Add a quick **Mute recording for this hook** action from a stream row (including `gui.media_sync_did_progress` during media downloads), with visible session-muted state and an easy unmute path. Hiding from view alone must not be presented as protection against buffer eviction or console spam.
+- [x] Handle invalid regex input without disrupting recording or the UI.
+- [x] Guard tracer-owned UI work against recursive tracing and stop timers on teardown.
+- [x] Test model updates/filtering with Qt fixtures where feasible.
 - [ ] Run a 100-card review session and verify responsiveness and bounded row retention.
 
 **Exit check:** the live panel stays responsive during the review session, with working controls and thread highlighting.

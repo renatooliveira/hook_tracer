@@ -1,8 +1,8 @@
 # Hook Tracer
 
 A developer add-on for observing Anki's Python hooks and filters. The headless
-core and add-on lifecycle are implemented; the dock panel is planned for phase 3.
-See [spec.md](spec.md) and [tasks.md](tasks.md) for the implementation plan.
+core, add-on lifecycle, and live stream dock are implemented; detail and catalog
+views are planned for phase 4. See [spec.md](spec.md) and [tasks.md](tasks.md) for the implementation plan.
 
 ## Development
 
@@ -27,7 +27,7 @@ To print real pylib hook events from a disposable collection, run
 See [compatibility decisions](docs/compatibility.md) for verified upstream
 behavior, import-order requirements, and platform limitations.
 
-## Phase 2: Anki console trace (26.9.3 only)
+## Anki console and stream panel (26.9.3 only)
 
 Symlink the `hook_tracer/` package directory into Anki's `addons21` directory.
 Find the exact directory by running `aqt.mw.pm.addonFolder()` in Anki's debug
@@ -39,10 +39,19 @@ ln -s /absolute/path/to/hook_tracer/hook_tracer /path/to/Anki2/addons21/hook_tra
 
 Restart Anki (use a disposable profile). **Tools > Hook Tracer: Record** toggles
 recording; it starts paused unless `trace_on_startup` is set to `true` in the
-add-on config. Open Anki's debug console (Ctrl+:); its log displays retained
-hook events and continues updating every 250 ms while open. Close the console
-to stop output; recording can continue in the background. To stop/unpatch
-entirely during a session, run `import hook_tracer; hook_tracer.stop()` in the
+add-on config. **Tools > Hook Tracer** opens the reusable live stream dock.
+Its Pause/Resume, Clear, hook-name substring/regex filter, and no-callbacks
+filter act on the buffered stream. Invalid regexes show an error instead of
+interrupting recording. A row's **Mute recording for selected hook** action
+stops new events for that hook from entering the buffer or debug console; use
+the **Session mutes** dropdown to unmute even if no rows remain. Session mutes
+are not saved across restarts yet. A view filter, unlike muting, does not
+prevent buffer eviction or debug-console spam.
+
+Open Anki's debug console (Ctrl+:); its log displays retained hook events and
+continues updating every 250 ms while open. Close the console to stop output;
+recording can continue in the background. To stop/unpatch entirely during a
+session, run `import hook_tracer; hook_tracer.stop()` in the
 console. Restart Anki or call `hook_tracer.start(aqt.mw)` to re-enable it.
 
 Startup coverage begins only when Anki imports this package. Anki 26.9.3 loads
@@ -68,15 +77,16 @@ import hook_tracer
 Counter(e.hook for e in hook_tracer.start(aqt.mw).recorder.snapshot()).most_common(20)
 ```
 
-This is a sample, not a full-session count after buffer eviction. The real
-Anki smoke test and noise measurement remain outstanding; automated offscreen
-Qt tests are not a substitute.
+This is a sample, not a full-session count after buffer eviction. A real Anki
+smoke test, a 100-card review-session responsiveness check, and noise
+measurement remain outstanding; automated offscreen Qt tests are not a
+substitute.
 
 ## Layout
 
 - `hook_tracer/__init__.py`: add-on startup, Tools toggle, console feed and shutdown
 - `hook_tracer/core/`: pure-Python discovery, recording, and patching (ownership is phase 4)
-- `hook_tracer/ui/`: future dock panel
+- `hook_tracer/ui/`: main-thread live stream dock and bounded table model
 - `tests/`: upstream compatibility probes and headless tests
 
 ## Contribution workflow
