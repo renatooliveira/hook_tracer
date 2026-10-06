@@ -129,6 +129,16 @@ Source: `spec.md`. Tasks are ordered by dependency and grouped by its milestones
 - [ ] Implement optional `runHook`/`runFilter` tracing behind `trace_legacy`, including install/uninstall and nested generated-to-legacy dispatch tests.
 - [ ] Add a “record this action” control that captures only between two clicks.
 
+## Post-v1 backlog — broader Anki activity tracing (not hooks)
+
+These are optional, separately labeled **boundary events**, not hook/filter events. Validate the use case before expanding Hook Tracer's scope; keep each category opt-in, bounded, safe to unpatch, and off by default.
+
+- [ ] Evaluate Python → Rust command tracing at `RustBackend._run_command`: measure call volume/overhead, preserve exceptions and results, and resolve readable operation names reliably (caller-frame inference needs validation). Avoid logging protobuf payloads by default.
+- [ ] Evaluate SQL tracing at `DBProxy._query`: report timings and sanitized query templates, not values or results by default; account for the same operation also appearing as a backend call and protect card/note content.
+- [ ] Evaluate JS → Python bridge events at `AnkiWebView._onBridgeCmd`: identify what is *not* already exposed by `gui.webview_did_receive_js_message` (including `domDone`/`close`), and avoid duplicate events.
+- [ ] Evaluate Python → JS events at `AnkiWebView.evalWithCallback` (including `eval` delegation): distinguish enqueue time from actual asynchronous execution/completion, avoid double-counting, and redact JS payloads and callback results.
+- [ ] If there is demonstrated demand, design category filters, correlation with hook events, privacy defaults, overhead limits, compatibility tests, and a clear product name/scope before implementation.
+
 ## Deferred product decisions
 
 - [ ] Choose internal-team distribution, public AnkiWeb distribution, or integration into Anki's debug console. Public distribution remains outside v1.
