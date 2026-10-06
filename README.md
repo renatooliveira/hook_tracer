@@ -1,8 +1,8 @@
 # Hook Tracer
 
-A developer add-on for observing Anki's Python hooks and filters. **Scaffold only:**
-recording and the panel are not implemented yet. See [spec.md](spec.md) and
-[tasks.md](tasks.md) for the design and phased implementation plan.
+A developer add-on for observing Anki's Python hooks and filters. The headless
+core is implemented; add-on lifecycle and panel are planned for later phases.
+See [spec.md](spec.md) and [tasks.md](tasks.md) for the implementation plan.
 
 ## Development
 
@@ -21,6 +21,8 @@ resolved tool and dependency versions. Use `uv run ruff format .` to format code
 Mypy checks the add-on strictly; upstream contract probes in `tests/` are runtime
 tests, not part of the strict typing scope. Tests do not use a real Anki profile.
 GUI discovery runs in a separate offscreen process; core imports remain Qt-free.
+To print real pylib hook events from a disposable collection, run
+`uv run python -m examples.trace_note`.
 
 See [compatibility decisions](docs/compatibility.md) for verified upstream
 behavior, import-order requirements, and platform limitations. Future real-Anki
@@ -30,7 +32,7 @@ instructions will be added with the runnable add-on lifecycle.
 ## Layout
 
 - `hook_tracer/__init__.py`: future add-on lifecycle entry point
-- `hook_tracer/core/`: pure-Python recording, discovery, patching, and ownership
+- `hook_tracer/core/`: pure-Python discovery, recording, and patching (ownership is phase 4)
 - `hook_tracer/ui/`: future main-thread Qt interface
 - `tests/`: upstream compatibility probes and headless tests
 
