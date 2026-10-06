@@ -16,9 +16,14 @@ from types import SimpleNamespace
 
 app = QApplication([])
 class Manager:
+    def __init__(self):
+        self.config = {'trace_on_startup': True, 'buffer_size': 12}
     def getConfig(self, module):
         assert module == 'hook_tracer'
-        return {'trace_on_startup': True}
+        return self.config
+    def writeConfig(self, module, conf):
+        assert module == 'hook_tracer'
+        self.config = conf
 
 mw = QMainWindow()
 mw.app = app
@@ -30,6 +35,7 @@ import hook_tracer
 controller = hook_tracer.start(mw)
 assert hook_tracer.start(mw) is controller
 assert controller.patcher.recording
+assert controller.recorder._events.maxlen == 12
 assert type(anki.hooks.note_will_flush).__call__ is not original
 gui_hooks.main_window_did_init()
 assert 'gui.main_window_did_init' in [e.hook for e in controller.recorder.snapshot()]
@@ -39,6 +45,16 @@ assert controller._dock is not None
 first_dock = controller._dock
 controller.open_action.trigger()
 assert controller._dock is first_dock
+controller.patcher.muted.add('gui.media_sync_did_progress')
+assert mw.addonManager.config.get('muted_hooks') is None
+first_dock.refresh()
+assert 'not saved' in first_dock.mute_status.text()
+first_dock.save_mutes.click()
+assert 'match saved' in first_dock.mute_status.text()
+assert mw.addonManager.config['muted_hooks'] == ['gui.media_sync_did_progress']
+assert mw.addonManager.config['buffer_size'] == 12
+controller.patcher.muted.clear()
+assert mw.addonManager.config['muted_hooks'] == ['gui.media_sync_did_progress']
 
 console = QDialog()
 console._log = QPlainTextEdit(console)
@@ -59,9 +75,13 @@ assert len(mw.form.menuTools.actions()) == 0
 assert type(anki.hooks.note_will_flush).__call__ is original
 assert not gui_hooks.debug_console_will_show.count()
 hook_tracer.stop()
-mw.addonManager.getConfig = lambda module: None
+mw.addonManager.config = {'trace_on_startup': False, 'trace_legacy': True,
+                          'muted_hooks': ['anki.note_will_flush']}
 paused = hook_tracer.start(mw)
 assert not paused.patcher.recording
+assert paused.patcher.muted == {'anki.note_will_flush'}
+assert not paused.config.trace_legacy
+assert 'unsupported' in paused.config_warnings[0]
 hook_tracer.stop()
 """
     result = subprocess.run(

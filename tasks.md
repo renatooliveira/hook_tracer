@@ -108,17 +108,17 @@ Source: `spec.md`. Tasks are ordered by dependency and grouped by its milestones
 
 ## 5. Polish and v1 validation
 
-- [ ] Ship `config.json` defaults and `config.md` documentation for `trace_on_startup`, `buffer_size`, `capture_args`, `repr_max_len`, `muted_hooks`, and `trace_legacy`.
-- [ ] Validate config types/ranges and document when changes take effect through Anki's add-on config dialog; explain that `trace_legacy=true` is unsupported and keep legacy tracing disabled in v1.
-- [ ] Add selected-hook mute/unmute controls and persist changes back to config when the user opts to keep a session mute across restarts; distinguish temporary session mutes from persisted mutes.
-- [ ] Display the internal recording-error counter in the panel.
-- [ ] Export a snapshot of the current buffer as JSON Lines, not just visible filtered rows.
-- [ ] Warn before export that arguments may contain card/note content; handle cancel and write failures safely.
-- [ ] Test JSON serialization, config validation, mute persistence, and export behavior.
-- [ ] Verify clean shutdown/unpatch, timer cleanup, bounded memory, and local-only operation.
-- [ ] Run `pytest`, `mypy`, and `ruff`; repeat the paused-overhead check.
+- [x] Ship `config.json` defaults and `config.md` documentation for `trace_on_startup`, `buffer_size`, `capture_args`, `repr_max_len`, `muted_hooks`, and `trace_legacy`.
+- [x] Validate config types/ranges and document when changes take effect through Anki's add-on config dialog; explain that `trace_legacy=true` is unsupported and keep legacy tracing disabled in v1.
+- [x] Add selected-hook mute/unmute controls and persist changes back to config when the user opts to keep a session mute across restarts; distinguish temporary session mutes from persisted mutes.
+- [x] Display the internal recording-error counter in the panel.
+- [x] Export a snapshot of the current buffer as JSON Lines, not just visible filtered rows.
+- [x] Warn before export that arguments may contain card/note content; handle cancel and write failures safely.
+- [x] Test JSON serialization, config validation, mute persistence, and export behavior.
+- [x] Verify clean shutdown/unpatch, timer cleanup, bounded memory, and local-only operation in automated checks (live Anki teardown still pending).
+- [x] Run `pytest`, `mypy`, and `ruff`; repeat the paused-overhead check.
 - [ ] Complete the real-Anki checklist: open panel, review cards, open editor/browser, sync, exercise controls/details/catalog/export, and check the debug console for errors.
-- [ ] Document installation, supported versions, usage, privacy considerations, known limitations, and the manual test checklist.
+- [x] Document installation, supported versions, usage, privacy considerations, known limitations, and the manual test checklist.
 
 **Exit check:** v1 requirements are covered by automated checks and a recorded manual smoke test on the supported Anki target.
 

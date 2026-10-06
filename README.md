@@ -46,7 +46,8 @@ filter act on the buffered stream. Invalid regexes show an error instead of
 interrupting recording. A row's **Mute recording for selected hook** action
 stops new events for that hook from entering the buffer or debug console; use
 the **Session mutes** dropdown to unmute even if no rows remain. Session mutes
-are not saved across restarts yet. A view filter, unlike muting, does not
+are temporary unless you click **Save mutes as default**; saved mutes apply
+immediately and on the next launch. A view filter, unlike muting, does not
 prevent buffer eviction or debug-console spam. Selecting a row shows stored
 argument reprs, callback owners, filter input/output and errors in the detail
 pane. The Catalog tab lists discovered hooks, current registrations and
@@ -54,7 +55,11 @@ session fire counts, sorted by callback count. Counts include attempted fires
 (including callbacks that raise) only while recording is on and the hook is
 unmuted and not tracer-suppressed. Pausing and muting do not increment counts;
 clearing the buffer does not reset them. The catalog refreshes every second
-while its tab is open.
+while its tab is open. The panel shows recording errors; **Export JSON Lines…**
+exports the full current buffer, not merely visible filtered rows. You must
+confirm a privacy warning before choosing a local output file. See the
+[configuration reference](hook_tracer/config.md) for defaults, allowed ranges,
+and when changes take effect.
 
 Open Anki's debug console (Ctrl+:); its log displays retained hook events and
 continues updating every 250 ms while open. Close the console to stop output;
@@ -70,11 +75,17 @@ supported guarantee across Anki versions. The Tools menu is already available
 when this add-on loads. The generated legacy delegation is still executed but
 not recorded as a separate event.
 
-**Manual smoke checklist (still required on a real Anki install):** turn on
-recording, open the debug console, review several cards, and confirm
-`gui.reviewer_did_answer_card` and other reviewer hooks appear without a change
-in reviewer behavior or errors. Toggle recording off/on; check that paused
-reviews emit no new events. Stop/unpatch and check the reviewer still works.
+**Manual smoke checklist (still required on a real Anki install):** use a
+disposable profile. Open the panel, turn on recording, review 100 cards, open
+the editor and browser, run a sync, and confirm expected reviewer events such
+as `gui.reviewer_did_answer_card` without a change in behavior or errors in
+the debug console. Exercise pause/resume, clear, name and callback filters,
+invalid regex, detail selection, catalog registration/owners, mute/unmute,
+Save mutes as default, and JSON Lines export/cancel. Confirm an unfiltered
+buffer snapshot is exported, then inspect it before sharing. Toggle recording
+off/on, close/reopen the panel, and stop/unpatch; reviewer behavior and UI
+responsiveness should remain unchanged. Repeat a media download to measure
+noisy hook frequency and ensure a temporary mute prevents console flooding.
 Before choosing muted defaults, count the most frequent hook names in a
 representative review session from the bounded snapshot (up to 5000 events):
 
@@ -85,11 +96,15 @@ import hook_tracer
 Counter(e.hook for e in hook_tracer.start(aqt.mw).recorder.snapshot()).most_common(20)
 ```
 
-This is a sample, not a full-session count after buffer eviction. A real Anki
-smoke test, a 100-card review-session responsiveness check, and noise
-measurement remain outstanding; automated offscreen Qt and real pylib
-`Collection` tests are not a substitute for checking add-on attribution and
-dynamic registrations in a live Anki session.
+This is a sample, not a full-session count after buffer eviction. **The real
+Anki smoke test, 100-card responsiveness check and noise measurement have not
+been completed**; automated offscreen Qt and real pylib `Collection` tests
+cannot validate GUI add-on attribution and dynamic registrations in a live
+session. Only Anki 26.9.3 is supported. Hooks fired before add-on import,
+legacy-only hooks, Rust operations and JavaScript execution are not traced.
+Recording is local and bounded, but captured reprs, the debug-console log and
+exports may contain private card/note content; nothing is transmitted by this
+add-on, and exports must be reviewed before sharing.
 
 ## Layout
 
