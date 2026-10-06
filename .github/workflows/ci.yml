@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Qt runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libopengl0 libxkbcommon-x11-0 libxcb-cursor0
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          python-version: '3.12'
+      - name: Install locked dependencies
+        run: uv sync --locked
+      - name: Tests (including offscreen Qt)
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: uv run --locked pytest -q
+      - name: Type check
+        run: uv run --locked mypy
+      - name: Lint
+        run: uv run --locked ruff check .
+      - name: Format
+        run: uv run --locked ruff format --check .
