@@ -1,8 +1,9 @@
 # Hook Tracer
 
 A developer add-on for observing Anki's Python hooks and filters. The headless
-core, add-on lifecycle, and live stream dock are implemented; detail and catalog
-views are planned for phase 4. See [spec.md](spec.md) and [tasks.md](tasks.md) for the implementation plan.
+core, add-on lifecycle, and live stream dock with details and a catalog are
+implemented. See [spec.md](spec.md) and [tasks.md](tasks.md) for the
+implementation plan.
 
 ## Development
 
@@ -46,7 +47,14 @@ interrupting recording. A row's **Mute recording for selected hook** action
 stops new events for that hook from entering the buffer or debug console; use
 the **Session mutes** dropdown to unmute even if no rows remain. Session mutes
 are not saved across restarts yet. A view filter, unlike muting, does not
-prevent buffer eviction or debug-console spam.
+prevent buffer eviction or debug-console spam. Selecting a row shows stored
+argument reprs, callback owners, filter input/output and errors in the detail
+pane. The Catalog tab lists discovered hooks, current registrations and
+session fire counts, sorted by callback count. Counts include attempted fires
+(including callbacks that raise) only while recording is on and the hook is
+unmuted and not tracer-suppressed. Pausing and muting do not increment counts;
+clearing the buffer does not reset them. The catalog refreshes every second
+while its tab is open.
 
 Open Anki's debug console (Ctrl+:); its log displays retained hook events and
 continues updating every 250 ms while open. Close the console to stop output;
@@ -79,14 +87,15 @@ Counter(e.hook for e in hook_tracer.start(aqt.mw).recorder.snapshot()).most_comm
 
 This is a sample, not a full-session count after buffer eviction. A real Anki
 smoke test, a 100-card review-session responsiveness check, and noise
-measurement remain outstanding; automated offscreen Qt tests are not a
-substitute.
+measurement remain outstanding; automated offscreen Qt and real pylib
+`Collection` tests are not a substitute for checking add-on attribution and
+dynamic registrations in a live Anki session.
 
 ## Layout
 
 - `hook_tracer/__init__.py`: add-on startup, Tools toggle, console feed and shutdown
-- `hook_tracer/core/`: pure-Python discovery, recording, and patching (ownership is phase 4)
-- `hook_tracer/ui/`: main-thread live stream dock and bounded table model
+- `hook_tracer/core/`: pure-Python discovery, recording, patching, and ownership
+- `hook_tracer/ui/`: stream dock, bounded table model, details, and catalog
 - `tests/`: upstream compatibility probes and headless tests
 
 ## Contribution workflow

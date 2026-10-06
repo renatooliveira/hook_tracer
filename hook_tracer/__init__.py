@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from aqt.main import AnkiQt
 
 from .core.discovery import discover
+from .core.owners import add_on_names
 from .core.patching import Patcher
 from .core.recorder import Recorder, TraceEvent
 
@@ -22,7 +23,11 @@ class Controller:
         from aqt.qt import QAction, QTimer
 
         self.mw = mw
-        self.recorder = Recorder()
+        manager = mw.addonManager
+        folders: list[str] = getattr(manager, "allAddons", lambda: [])()
+        self.recorder = Recorder(
+            add_on_names=add_on_names(folders, manager.addonName) if folders else {}
+        )
         self.patcher = Patcher(self.recorder)
         self._timers: list[QTimer] = []
         self._last_seq: dict[QTimer, int] = {}
@@ -32,7 +37,8 @@ class Controller:
         config = mw.addonManager.getConfig(__name__) or {}
         self.patcher.recording = config.get("trace_on_startup") is True
         try:
-            self.patcher.install(discover([("anki", anki.hooks), ("gui", gui_hooks)]))
+            self.hooks = discover([("anki", anki.hooks), ("gui", gui_hooks)])
+            self.patcher.install(self.hooks)
             with self.patcher.suppress():
                 self.action = QAction("Hook Tracer: Record", mw)
                 self.action.setCheckable(True)
@@ -60,7 +66,9 @@ class Controller:
 
         with self.patcher.suppress():
             if self._dock is None:
-                self._dock = StreamDock(self.mw, self.patcher, self.recorder, self.set_recording)
+                self._dock = StreamDock(
+                    self.mw, self.patcher, self.recorder, self.set_recording, self.hooks
+                )
                 self.mw.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self._dock)
             self._dock.show()
             self._dock.raise_()

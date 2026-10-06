@@ -85,23 +85,23 @@ Source: `spec.md`. Tasks are ordered by dependency and grouped by its milestones
 
 ### Callback ownership — `core/owners.py`
 
-- [ ] Unwrap bound methods and `functools.partial` callbacks, including nested wrappers.
-- [ ] Resolve qualified callback names and add-on folders from `__module__`; label `aqt`/`anki` callbacks as core.
-- [ ] Map folders to display names through an injected add-on-manager adapter, keeping the core Qt-free.
-- [ ] Handle unknown modules and unusual callable objects safely; test ownership resolution headlessly.
-- [ ] Store callback names and owners at fire time so subsequent registration changes do not alter old events.
+- [x] Unwrap bound methods and `functools.partial` callbacks, including nested wrappers.
+- [x] Resolve qualified callback names and add-on folders from `__module__`; label `aqt`/`anki` callbacks as core.
+- [x] Map folders to display names through an injected add-on-manager adapter, keeping the core Qt-free.
+- [x] Handle unknown modules and unusual callable objects safely; test ownership resolution headlessly.
+- [x] Store callback names and owners at fire time so subsequent registration changes do not alter old events.
 
 ### Details — `ui/detail.py`
 
-- [ ] Show selected-event argument reprs, callback names/owners, filter input/output and changed flag, and exception summary.
-- [ ] Show stored reprs in full within the configured capture limit; do not retain original objects for expansion.
-- [ ] Handle empty selection, cleared/evicted events, disabled argument capture, and failed filter dispatch.
+- [x] Show selected-event argument reprs, callback names/owners, filter input/output and changed flag, and exception summary.
+- [x] Show stored reprs in full within the configured capture limit; do not retain original objects for expansion.
+- [x] Handle empty selection, cleared/evicted events, disabled argument capture, and failed filter dispatch.
 
 ### Catalog — `ui/catalog.py`
 
-- [ ] List every discovered hook with kind, session fire count, current callback count, and owning add-ons.
-- [ ] Maintain session counts independently of buffer eviction; define count behavior for pause, mute, and clear.
-- [ ] Refresh current registrations safely and support sorting by callback count.
+- [x] List every discovered hook with kind, session fire count, current callback count, and owning add-ons.
+- [x] Maintain session counts independently of buffer eviction; define count behavior for pause, mute, and clear.
+- [x] Refresh current registrations safely and support sorting by callback count.
 - [ ] Verify attribution and dynamic callback registration/removal in a real Anki session.
 
 **Exit check:** details explain each recorded dispatch and the catalog shows current listeners with usable ownership labels.
@@ -128,6 +128,16 @@ Source: `spec.md`. Tasks are ordered by dependency and grouped by its milestones
 - [ ] If approved, implement per-callback timing with parity tests for ordering, filter chaining, callback removal, exceptions, and legacy behavior.
 - [ ] Implement optional `runHook`/`runFilter` tracing behind `trace_legacy`, including install/uninstall and nested generated-to-legacy dispatch tests.
 - [ ] Add a “record this action” control that captures only between two clicks.
+
+## Post-v1 backlog — broader Anki activity tracing (not hooks)
+
+These are optional, separately labeled **boundary events**, not hook/filter events. Validate the use case before expanding Hook Tracer's scope; keep each category opt-in, bounded, safe to unpatch, and off by default.
+
+- [ ] Evaluate Python → Rust command tracing at `RustBackend._run_command`: measure call volume/overhead, preserve exceptions and results, and resolve readable operation names reliably (caller-frame inference needs validation). Avoid logging protobuf payloads by default.
+- [ ] Evaluate SQL tracing at `DBProxy._query`: report timings and sanitized query templates, not values or results by default; account for the same operation also appearing as a backend call and protect card/note content.
+- [ ] Evaluate JS → Python bridge events at `AnkiWebView._onBridgeCmd`: identify what is *not* already exposed by `gui.webview_did_receive_js_message` (including `domDone`/`close`), and avoid duplicate events.
+- [ ] Evaluate Python → JS events at `AnkiWebView.evalWithCallback` (including `eval` delegation): distinguish enqueue time from actual asynchronous execution/completion, avoid double-counting, and redact JS payloads and callback results.
+- [ ] If there is demonstrated demand, design category filters, correlation with hook events, privacy defaults, overhead limits, compatibility tests, and a clear product name/scope before implementation.
 
 ## Deferred product decisions
 

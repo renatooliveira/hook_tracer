@@ -2,12 +2,14 @@
 
 import reprlib
 from collections import deque
+from collections.abc import Mapping
 from dataclasses import dataclass
 from threading import Lock, current_thread
 from time import perf_counter_ns
 from typing import Any, Callable
 
 from .discovery import Kind
+from .owners import callback_owner
 
 
 @dataclass(frozen=True)
@@ -47,9 +49,16 @@ class _SafeRepr(reprlib.Repr):
 
 
 class Recorder:
-    def __init__(self, buffer_size: int = 5000, capture_args: bool = True, repr_max_len: int = 200):
+    def __init__(
+        self,
+        buffer_size: int = 5000,
+        capture_args: bool = True,
+        repr_max_len: int = 200,
+        add_on_names: Mapping[str, str] | None = None,
+    ):
         if buffer_size < 1 or repr_max_len < 1:
             raise ValueError("buffer_size and repr_max_len must be positive")
+        self.add_on_names = dict(add_on_names or {})
         self.capture_args = capture_args
         self.repr_max_len = repr_max_len
         self._events: deque[TraceEvent] = deque(maxlen=buffer_size)
@@ -87,18 +96,7 @@ class Recorder:
         )
 
     def callback_names(self, callbacks: tuple[object, ...]) -> tuple[tuple[str, str], ...]:
-        names = []
-        for callback in callbacks:
-            try:
-                module = getattr(callback, "__module__", None)
-                qualname = getattr(callback, "__qualname__", None)
-                if not isinstance(module, str) or not isinstance(qualname, str):
-                    module, qualname = type(callback).__module__, type(callback).__qualname__
-                names.append((f"{module}.{qualname}", "unknown"))
-            except Exception:
-                self.note_error()
-                names.append(("<callback unknown>", "unknown"))
-        return tuple(names)
+        return tuple(callback_owner(callback, self.add_on_names) for callback in callbacks)
 
     def record(
         self,

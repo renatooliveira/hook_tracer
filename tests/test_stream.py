@@ -12,6 +12,10 @@ from hook_tracer.core.recorder import Recorder
 from hook_tracer.core.patching import Patcher
 from hook_tracer.ui.stream_model import StreamModel
 from hook_tracer.ui.dock import StreamDock
+from hook_tracer.ui.catalog import CatalogModel, catalog_table
+from hook_tracer.ui.detail import describe
+from hook_tracer.core.discovery import discover
+from tests import fake_hooks as fake
 
 app = QApplication([])
 r = Recorder(buffer_size=3)
@@ -81,6 +85,7 @@ dock.show()
 app.processEvents()
 assert dock.model.rowCount() == 1
 dock.table.setCurrentIndex(dock.model.index(0, 1))
+assert 'gui.after_clear' in dock.detail.toPlainText()
 dock.mute.click()
 assert 'gui.after_clear' in p.muted
 assert dock.muted.count() == 1
@@ -92,11 +97,47 @@ dock.regex.setChecked(True)
 dock.search.setText('[')
 assert dock.filter_message.text().startswith('Invalid regex')
 dock.search.clear()
+last_event = r.snapshot()[0]
 dock.clear.click()
 assert dock.model.rowCount() == 0
 dock.hide()
 assert not dock.timer.isActive()
 dock.shutdown()
+assert describe(None) == 'Select a trace event.'
+assert '<argument capture disabled>' in describe(last_event, False)
+from dataclasses import replace
+filtered = replace(last_event, kind='filter', filter_in="'x'", filter_out="'y'", changed=True)
+assert "Filter input: 'x'" in describe(filtered)
+assert "Filter output: 'y'" in describe(filtered)
+assert 'Changed: True' in describe(filtered)
+failed = replace(filtered, filter_out=None, changed=None, error='ValueError: failed')
+assert 'Filter output: <dispatch failed>' in describe(failed)
+assert 'Error: ValueError: failed' in describe(failed)
+fake._DidSomethingHook._hooks = []
+infos = discover([('anki', fake)])
+p.install(infos)
+p.recording = True
+catalog, catalog_model = catalog_table(infos, p, r)
+def cb(value):
+    return None
+cb.__module__ = 'demo_addon.handlers'
+r.add_on_names['demo_addon'] = 'Demo'
+fake.did_something.append(cb)
+catalog_model.refresh()
+row = next(row for row in catalog_model.rows if row[0] == 'anki.did_something')
+assert row[3] == 1 and 'Demo' in row[4]
+fake.did_something('payload')
+catalog_model.refresh()
+row = next(row for row in catalog_model.rows if row[0] == 'anki.did_something')
+assert row[2] == 1
+assert 'Demo' in describe(r.snapshot()[-1])
+fake.did_something.remove(cb)
+catalog_model.refresh()
+row = next(row for row in catalog_model.rows if row[0] == 'anki.did_something')
+assert row[3] == 0 and row[2] == 1
+catalog.sortByColumn(3, Qt.SortOrder.DescendingOrder)
+assert catalog.model().data(catalog.model().index(0, 3), Qt.ItemDataRole.UserRole) >= 0
+p.uninstall()
 """
     result = subprocess.run(
         [sys.executable, "-c", script],
