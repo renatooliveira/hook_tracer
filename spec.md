@@ -89,9 +89,9 @@ def make_wrapper(name, kind, original):
 
 ## UI
 
-The UI is a `QDockWidget` on the main window, opened from the sole **Tools > Hook Tracer** menu entry, with two tabs: a live stream and a catalog. Recording is started/stopped in the panel, not from a second Tools-menu action; the optional `trace_on_startup` config can still capture events before opening the panel.
+The UI is a `QDockWidget` on the main window, opened from the sole **Tools > Hook Tracer** menu entry, with two views: a live stream and a catalog. The view switcher lives inside the dock content rather than using native Qt tabs, which can overlap the dock title on macOS. Recording is started/stopped in the panel, not from a second Tools-menu action; the optional `trace_on_startup` config can still capture events before opening the panel.
 
-**Stream tab**, a `QTableView` backed by a `QAbstractTableModel` over the event buffer:
+**Stream view**, a `QTableView` backed by a `QAbstractTableModel` over the event buffer:
 
 | Column | Content |
 | --- | --- |
@@ -107,7 +107,7 @@ Toolbar actions: start/stop recording, clear, a filter box (substring or regex o
 
 **Detail pane**, below the table, for the selected event: full argument reprs, the callback list with each callback's qualified name and owning add-on, the filter's input and output with a changed flag, and the exception if a callback raised.
 
-**Catalog tab**: every discovered hook with its kind, fire count this session, current callback count and owning add-ons. Sorting by callback count is the quickest way to see which add-ons hook into what.
+**Catalog view**: every discovered hook with its kind, fire count this session, current callback count and owning add-ons. Sorting by callback count is the quickest way to see which add-ons hook into what.
 
 **Export**: write the current buffer to a JSON Lines file. The save dialog warns that arguments can include card and note content.
 

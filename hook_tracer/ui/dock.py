@@ -4,6 +4,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from aqt.qt import (
+    QButtonGroup,
     QCheckBox,
     QComboBox,
     QDockWidget,
@@ -14,9 +15,9 @@ from aqt.qt import (
     QMessageBox,
     QPushButton,
     QSplitter,
+    QStackedWidget,
     Qt,
     QTableView,
-    QTabWidget,
     QTimer,
     QVBoxLayout,
     QWidget,
@@ -51,8 +52,25 @@ class StreamDock(QDockWidget):
         self._saved_mutes = frozenset(patcher.muted)
         self.model = StreamModel(recorder)
         self.setObjectName("HookTracerDock")
-        self.tabs = QTabWidget(self)
-        content = QWidget(self.tabs)
+        root = QWidget(self)
+        root_layout = QVBoxLayout(root)
+        root_layout.setContentsMargins(8, 8, 8, 8)
+        view_controls = QHBoxLayout()
+        view_controls.addWidget(QLabel("View:", root))
+        self.stream_button = QPushButton("Stream", root)
+        self.catalog_button = QPushButton("Catalog", root)
+        self.view_buttons = QButtonGroup(root)
+        for index, button in enumerate((self.stream_button, self.catalog_button)):
+            button.setCheckable(True)
+            self.view_buttons.addButton(button, index)
+            view_controls.addWidget(button)
+        self.stream_button.setChecked(True)
+        view_controls.addStretch()
+        root_layout.addLayout(view_controls)
+        self.pages = QStackedWidget(root)
+        root_layout.addWidget(self.pages)
+        self.view_buttons.idClicked.connect(self._tab_changed)
+        content = QWidget(self.pages)
         layout = QVBoxLayout(content)
         controls = QHBoxLayout()
         self.record_button = QPushButton(content)
@@ -109,11 +127,10 @@ class StreamDock(QDockWidget):
         footer.addWidget(self.errors)
         footer.addWidget(self.export)
         layout.addLayout(footer)
-        self.tabs.addTab(content, "Stream")
+        self.pages.addWidget(content)
         self.catalog_table, self.catalog_model = catalog_table(hooks or [], patcher, recorder)
-        self.tabs.addTab(self.catalog_table, "Catalog")
-        self.tabs.currentChanged.connect(self._tab_changed)
-        self.setWidget(self.tabs)
+        self.pages.addWidget(self.catalog_table)
+        self.setWidget(root)
         self._ticks = 0
         self._sync_recording()
         self._sync_mutes()
@@ -158,7 +175,7 @@ class StreamDock(QDockWidget):
                 self.detail.show_event(None)
                 self._selected_seq = None
             self._ticks += 1
-            if self.tabs.currentIndex() == 1 and self._ticks % 4 == 0:
+            if self.pages.currentIndex() == 1 and self._ticks % 4 == 0:
                 self.catalog_model.refresh()
             self._sync_recording()
             self.errors.setText(f"Recording errors: {self.recorder.recording_errors}")
@@ -167,6 +184,7 @@ class StreamDock(QDockWidget):
 
     def _tab_changed(self, index: int) -> None:
         with self.patcher.suppress():
+            self.pages.setCurrentIndex(index)
             if index == 1:
                 self.catalog_model.refresh()
 

@@ -47,6 +47,10 @@ first_dock = controller._dock
 controller.open_action.trigger()
 assert controller._dock is first_dock
 assert first_dock.record_button.text() == 'Stop recording'
+first_dock.catalog_button.click()
+assert first_dock.pages.currentIndex() == 1
+first_dock.stream_button.click()
+assert first_dock.pages.currentIndex() == 0
 controller.patcher.muted.add('gui.media_sync_did_progress')
 assert mw.addonManager.config.get('muted_hooks') is None
 first_dock.refresh()

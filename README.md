@@ -52,7 +52,9 @@ are temporary unless you click **Save mutes as default**; saved mutes apply
 immediately and on the next launch. A view filter, unlike muting, does not
 prevent buffer eviction or debug-console spam. Selecting a row shows stored
 argument reprs, callback owners, filter input/output and errors in the detail
-pane. The Catalog tab lists discovered hooks, current registrations and
+pane. The **View: Stream / Catalog** buttons switch views below the dock
+header (rather than native tabs, which overlap the title on macOS). The
+Catalog view lists discovered hooks, current registrations and
 session fire counts, sorted by callback count. Counts include attempted fires
 (including callbacks that raise) only while recording is on and the hook is
 unmuted and not tracer-suppressed. Pausing and muting do not increment counts;
