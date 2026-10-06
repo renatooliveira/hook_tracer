@@ -25,3 +25,37 @@ def test_add_note(tmp_path):
     finally:
         patcher.uninstall()
         col.close()
+
+
+def test_real_registrations_and_attribution(tmp_path):
+    recorder = Recorder()
+    patcher = Patcher(recorder)
+    hook = anki.hooks.note_will_be_added
+    col = Collection(str(tmp_path / "registrations.anki2"))
+
+    def listener(*args):
+        pass
+
+    listener.__module__ = "anki.custom"
+    hook.append(listener)
+    try:
+        patcher.install(discover([("anki", anki.hooks)]))
+        patcher.recording = True
+        for n in range(2):
+            if n:
+                hook.remove(listener)
+            note = col.new_note(col.models.current())
+            note["Front"] = f"note {n}"
+            note["Back"] = "back"
+            col.add_note(note, col.decks.id("Default"))
+        events = [e for e in recorder.snapshot() if e.hook == "anki.note_will_be_added"]
+        assert len(events) == 2
+        assert events[0].callbacks == (
+            ("anki.custom.test_real_registrations_and_attribution.<locals>.listener", "core"),
+        )
+        assert events[1].callbacks == ()
+        assert patcher.counts()["anki.note_will_be_added"] == 2
+    finally:
+        hook.remove(listener)
+        patcher.uninstall()
+        col.close()

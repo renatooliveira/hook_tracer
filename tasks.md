@@ -85,23 +85,23 @@ Source: `spec.md`. Tasks are ordered by dependency and grouped by its milestones
 
 ### Callback ownership — `core/owners.py`
 
-- [ ] Unwrap bound methods and `functools.partial` callbacks, including nested wrappers.
-- [ ] Resolve qualified callback names and add-on folders from `__module__`; label `aqt`/`anki` callbacks as core.
-- [ ] Map folders to display names through an injected add-on-manager adapter, keeping the core Qt-free.
-- [ ] Handle unknown modules and unusual callable objects safely; test ownership resolution headlessly.
-- [ ] Store callback names and owners at fire time so subsequent registration changes do not alter old events.
+- [x] Unwrap bound methods and `functools.partial` callbacks, including nested wrappers.
+- [x] Resolve qualified callback names and add-on folders from `__module__`; label `aqt`/`anki` callbacks as core.
+- [x] Map folders to display names through an injected add-on-manager adapter, keeping the core Qt-free.
+- [x] Handle unknown modules and unusual callable objects safely; test ownership resolution headlessly.
+- [x] Store callback names and owners at fire time so subsequent registration changes do not alter old events.
 
 ### Details — `ui/detail.py`
 
-- [ ] Show selected-event argument reprs, callback names/owners, filter input/output and changed flag, and exception summary.
-- [ ] Show stored reprs in full within the configured capture limit; do not retain original objects for expansion.
-- [ ] Handle empty selection, cleared/evicted events, disabled argument capture, and failed filter dispatch.
+- [x] Show selected-event argument reprs, callback names/owners, filter input/output and changed flag, and exception summary.
+- [x] Show stored reprs in full within the configured capture limit; do not retain original objects for expansion.
+- [x] Handle empty selection, cleared/evicted events, disabled argument capture, and failed filter dispatch.
 
 ### Catalog — `ui/catalog.py`
 
-- [ ] List every discovered hook with kind, session fire count, current callback count, and owning add-ons.
-- [ ] Maintain session counts independently of buffer eviction; define count behavior for pause, mute, and clear.
-- [ ] Refresh current registrations safely and support sorting by callback count.
+- [x] List every discovered hook with kind, session fire count, current callback count, and owning add-ons.
+- [x] Maintain session counts independently of buffer eviction; define count behavior for pause, mute, and clear.
+- [x] Refresh current registrations safely and support sorting by callback count.
 - [ ] Verify attribution and dynamic callback registration/removal in a real Anki session.
 
 **Exit check:** details explain each recorded dispatch and the catalog shows current listeners with usable ownership labels.

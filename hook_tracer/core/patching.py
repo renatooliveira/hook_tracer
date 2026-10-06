@@ -3,7 +3,7 @@
 import functools
 import inspect
 from contextlib import contextmanager
-from threading import local
+from threading import Lock, local
 from time import perf_counter_ns
 from typing import Any, Callable, Iterator
 
@@ -18,6 +18,13 @@ class Patcher:
         self.muted: set[str] = set()
         self._originals: dict[type, Callable[..., Any]] = {}
         self._guard = local()
+        self._count_lock = Lock()
+        self._counts: dict[str, int] = {}
+
+    def counts(self) -> dict[str, int]:
+        """Counts eligible fires (including failing dispatches); buffer clear leaves them intact."""
+        with self._count_lock:
+            return self._counts.copy()
 
     @contextmanager
     def suppress(self) -> Iterator[None]:
@@ -62,6 +69,8 @@ class Patcher:
             ):
                 return original(instance, *args, **kwargs)
             started = perf_counter_ns()
+            with self._count_lock:
+                self._counts[info.name] = self._counts.get(info.name, 0) + 1
             callbacks: tuple[tuple[str, str], ...] = ()
             arg_text: tuple[str, ...] = ()
             input_value: object = None
