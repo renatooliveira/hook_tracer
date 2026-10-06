@@ -1,3 +1,8 @@
 {
-  "trace_on_startup": false
+  "trace_on_startup": false,
+  "buffer_size": 5000,
+  "capture_args": true,
+  "repr_max_len": 200,
+  "muted_hooks": [],
+  "trace_legacy": false
 }

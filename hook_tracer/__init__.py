@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from aqt.main import AnkiQt
 
+from .core.config import validate
 from .core.discovery import discover
 from .core.owners import add_on_names
 from .core.patching import Patcher
@@ -25,17 +26,24 @@ class Controller:
         self.mw = mw
         manager = mw.addonManager
         folders: list[str] = getattr(manager, "allAddons", lambda: [])()
+        # Read config before installation, while startup hooks are still untouched.
+        raw_config = manager.getConfig(__name__)
+        self.config, self.config_warnings = validate(raw_config if raw_config is not None else {})
         self.recorder = Recorder(
-            add_on_names=add_on_names(folders, manager.addonName) if folders else {}
+            buffer_size=self.config.buffer_size,
+            capture_args=self.config.capture_args,
+            repr_max_len=self.config.repr_max_len,
+            add_on_names=add_on_names(folders, manager.addonName) if folders else {},
         )
         self.patcher = Patcher(self.recorder)
+        self.patcher.muted.update(self.config.muted_hooks)
+        for warning in self.config_warnings:
+            print(f"[Hook Tracer config] {warning}")
         self._timers: list[QTimer] = []
         self._last_seq: dict[QTimer, int] = {}
         self._stopped = False
         self._dock: Any = None
-        # Config is read before installation and before any later startup hooks fire.
-        config = mw.addonManager.getConfig(__name__) or {}
-        self.patcher.recording = config.get("trace_on_startup") is True
+        self.patcher.recording = self.config.trace_on_startup
         try:
             self.hooks = discover([("anki", anki.hooks), ("gui", gui_hooks)])
             self.patcher.install(self.hooks)
@@ -67,11 +75,25 @@ class Controller:
         with self.patcher.suppress():
             if self._dock is None:
                 self._dock = StreamDock(
-                    self.mw, self.patcher, self.recorder, self.set_recording, self.hooks
+                    self.mw,
+                    self.patcher,
+                    self.recorder,
+                    self.set_recording,
+                    self.hooks,
+                    self.persist_mutes,
+                    self.config_warnings,
                 )
                 self.mw.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self._dock)
             self._dock.show()
             self._dock.raise_()
+
+    def persist_mutes(self, names: set[str]) -> None:
+        """Save only an explicit user choice, preserving other add-on settings."""
+        manager = self.mw.addonManager
+        current = manager.getConfig(__name__)
+        config = dict(current) if isinstance(current, dict) else {}
+        config["muted_hooks"] = sorted(names)
+        manager.writeConfig(__name__, config)
 
     def _console_opened(self, console: Any) -> None:
         """Temporary debug-console output until the phase 3 stream panel exists."""
