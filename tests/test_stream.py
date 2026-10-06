@@ -13,7 +13,7 @@ from hook_tracer.core.patching import Patcher
 from hook_tracer.ui.stream_model import StreamModel
 from hook_tracer.ui.dock import StreamDock
 from hook_tracer.ui.catalog import CatalogModel, catalog_table
-from hook_tracer.ui.detail import describe
+from hook_tracer.ui.detail import describe, render_event
 from hook_tracer.core.discovery import discover
 from tests import fake_hooks as fake
 
@@ -73,12 +73,16 @@ model.refresh()
 fire('gui.after_clear')
 
 mw = QMainWindow()
+mw.resize(1200, 900)
 dock = StreamDock(mw, p, r, lambda value: setattr(p, 'recording', value))
 mw.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 mw.show()
 dock.show()
 app.processEvents()
 assert dock.model.rowCount() == 1
+assert dock.splitter.sizes()[0] > dock.splitter.sizes()[1]
+dock.splitter.setSizes([200, 500])
+assert dock.splitter.sizes()[1] > dock.splitter.sizes()[0]
 r.note_error()
 dock.refresh()
 assert 'Recording errors: 1' in dock.errors.text()
@@ -89,13 +93,17 @@ app.processEvents()
 assert dock.model.rowCount() == 1
 dock.table.setCurrentIndex(dock.model.index(0, 1))
 assert 'gui.after_clear' in dock.detail.toPlainText()
+assert 'Arguments' in dock.detail.toPlainText()
+dock.detail.copy_button.click()
+assert app.clipboard().text() == describe(dock.model.event_at(0))
 dock.mute.click()
 assert 'gui.after_clear' in p.muted
 assert dock.muted.count() == 1
 dock.unmute.click()
 assert not p.muted
-dock.pause.click()
+dock.record_button.click()
 assert not p.recording
+assert dock.record_button.text() == 'Start recording'
 dock.regex.setChecked(True)
 dock.search.setText('[')
 assert dock.filter_message.text().startswith('Invalid regex')
@@ -103,6 +111,8 @@ dock.search.clear()
 last_event = r.snapshot()[0]
 dock.clear.click()
 assert dock.model.rowCount() == 0
+assert 'Select a trace event.' in dock.detail.toPlainText()
+assert not dock.detail.copy_button.isEnabled()
 dock.hide()
 assert not dock.timer.isActive()
 dock.shutdown()
@@ -116,6 +126,11 @@ assert 'Changed: True' in describe(filtered)
 failed = replace(filtered, filter_out=None, changed=None, error='ValueError: failed')
 assert 'Filter output: <dispatch failed>' in describe(failed)
 assert 'Error: ValueError: failed' in describe(failed)
+assert 'Filter' in render_event(filtered)
+assert 'Error' in render_event(failed)
+injected = replace(last_event, args=("<script>alert('x')</script>",))
+assert '<script>' not in render_event(injected)
+assert '&lt;script&gt;' in render_event(injected)
 fake._DidSomethingHook._hooks = []
 infos = discover([('anki', fake)])
 p.install(infos)

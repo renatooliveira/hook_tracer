@@ -89,9 +89,9 @@ def make_wrapper(name, kind, original):
 
 ## UI
 
-The UI is a `QDockWidget` on the main window, opened from **Tools > Hook Tracer**, with two tabs: a live stream and a catalog.
+The UI is a `QDockWidget` on the main window, opened from the sole **Tools > Hook Tracer** menu entry, with two views: a live stream and a catalog. The view switcher lives inside the dock content rather than using native Qt tabs, which can overlap the dock title on macOS. Recording is started/stopped in the panel, not from a second Tools-menu action; the optional `trace_on_startup` config can still capture events before opening the panel.
 
-**Stream tab**, a `QTableView` backed by a `QAbstractTableModel` over the event buffer:
+**Stream view**, a `QTableView` backed by a `QAbstractTableModel` over the event buffer:
 
 | Column | Content |
 | --- | --- |
@@ -103,11 +103,11 @@ The UI is a `QDockWidget` on the main window, opened from **Tools > Hook Tracer*
 | Callbacks | Number registered at fire time |
 | Args | One-line summary of the arguments |
 
-Toolbar actions: pause/resume, clear, a filter box (substring or regex on hook name), "hide hooks with no callbacks", and mute/unmute the selected hook. Hiding is display-only; a quick **Mute recording for this hook** action also stops events from entering the ring buffer (and the temporary console feed), so high-frequency hooks cannot evict useful events. Make the muted state and unmute control visible even when the hook has no rows in the stream. Session mutes are temporary by default; offer an explicit option to persist them through the add-on config.
+Toolbar actions: start/stop recording, clear, a filter box (substring or regex on hook name), "hide hooks with no callbacks", and mute/unmute the selected hook. Hiding is display-only; a quick **Mute recording for this hook** action also stops events from entering the ring buffer (and the temporary console feed), so high-frequency hooks cannot evict useful events. Make the muted state and unmute control visible even when the hook has no rows in the stream. Session mutes are temporary by default; offer an explicit option to persist them through the add-on config.
 
 **Detail pane**, below the table, for the selected event: full argument reprs, the callback list with each callback's qualified name and owning add-on, the filter's input and output with a changed flag, and the exception if a callback raised.
 
-**Catalog tab**: every discovered hook with its kind, fire count this session, current callback count and owning add-ons. Sorting by callback count is the quickest way to see which add-ons hook into what.
+**Catalog view**: every discovered hook with its kind, fire count this session, current callback count and owning add-ons. Sorting by callback count is the quickest way to see which add-ons hook into what.
 
 **Export**: write the current buffer to a JSON Lines file. The save dialog warns that arguments can include card and note content.
 
@@ -183,7 +183,7 @@ Test plan:
 Each milestone ends with something you can run, so you can stop after any of them with a useful tool.
 
 1. **Headless core.** Discovery, patching and recorder with the fake-hook and pylib tests passing. Done when `pytest` is green and a script prints a trace of adding a note.
-2. **Console trace in Anki.** The add-on patches on load and prints events to the debug console behind a menu toggle. Done when reviewing a card prints the expected reviewer hooks.
+2. **Console trace in Anki.** The add-on patches on load and prints events to the debug console while recording. Once the panel exists, its recording button replaces the temporary menu toggle. Done when reviewing a card prints the expected reviewer hooks.
 3. **Stream panel.** Dock widget, table model, timer refresh, pause, clear and name filter. Done when the panel stays responsive during a 100-card review session.
 4. **Detail, owners and catalog.** Detail pane with callback owners and filter diffs, plus the catalog tab.
 5. **Polish.** Config keys, mute list, JSON Lines export, error counter.

@@ -56,7 +56,7 @@ Source: `spec.md`. Tasks are ordered by dependency and grouped by its milestones
 ## 2. Console trace in Anki
 
 - [x] Implement `hook_tracer/__init__.py` lifecycle: discover both modules, install patches, and cleanly stop/unpatch.
-- [x] Add a Tools-menu recording toggle and temporary debug-console event output.
+- [x] Add a single Tools-menu entry to open the panel, with recording controlled inside the panel, plus temporary debug-console event output.
 - [x] Load startup-recording configuration early enough to capture subsequent startup hooks; default to paused.
 - [x] Resolve add-on load-order expectations and document any startup coverage limitations.
 - [x] Document symlinking `hook_tracer/` into Anki's shared `addons21` directory.

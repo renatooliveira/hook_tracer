@@ -38,19 +38,25 @@ console (the add-ons directory is shared by profiles in that Anki installation):
 ln -s /absolute/path/to/hook_tracer/hook_tracer /path/to/Anki2/addons21/hook_tracer
 ```
 
-Restart Anki (use a disposable profile). **Tools > Hook Tracer: Record** toggles
-recording; it starts paused unless `trace_on_startup` is set to `true` in the
-add-on config. **Tools > Hook Tracer** opens the reusable live stream dock.
-Its Pause/Resume, Clear, hook-name substring/regex filter, and no-callbacks
+Restart Anki (use a disposable profile). **Tools > Hook Tracer** is the only
+menu entry; it opens the reusable live stream dock. Use **Start recording** or
+**Stop recording** inside the panel to control capture. Recording starts paused
+unless `trace_on_startup` is set to `true` in the add-on config, in which case
+startup events are captured before the panel opens. Closing the panel does not
+stop recording. Its Clear, hook-name substring/regex filter, and no-callbacks
 filter act on the buffered stream. Invalid regexes show an error instead of
 interrupting recording. A row's **Mute recording for selected hook** action
 stops new events for that hook from entering the buffer or debug console; use
 the **Session mutes** dropdown to unmute even if no rows remain. Session mutes
 are temporary unless you click **Save mutes as default**; saved mutes apply
 immediately and on the next launch. A view filter, unlike muting, does not
-prevent buffer eviction or debug-console spam. Selecting a row shows stored
-argument reprs, callback owners, filter input/output and errors in the detail
-pane. The Catalog tab lists discovered hooks, current registrations and
+prevent buffer eviction or debug-console spam. Selecting a row opens a compact,
+draggable detail inspector with separate argument, callback, filter (if relevant)
+and error (if relevant) sections. **Copy details** copies only stored text;
+no live objects are expanded. The **View: Stream / Catalog** buttons switch
+views below the dock
+header (rather than native tabs, which overlap the title on macOS). The
+Catalog view lists discovered hooks, current registrations and
 session fire counts, sorted by callback count. Counts include attempted fires
 (including callbacks that raise) only while recording is on and the hook is
 unmuted and not tracer-suppressed. Pausing and muting do not increment counts;

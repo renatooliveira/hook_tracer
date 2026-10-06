@@ -39,12 +39,18 @@ assert controller.recorder._events.maxlen == 12
 assert type(anki.hooks.note_will_flush).__call__ is not original
 gui_hooks.main_window_did_init()
 assert 'gui.main_window_did_init' in [e.hook for e in controller.recorder.snapshot()]
-assert len(mw.form.menuTools.actions()) == 2
+assert len(mw.form.menuTools.actions()) == 1
+assert mw.form.menuTools.actions()[0].text() == 'Hook Tracer'
 controller.open_action.trigger()
 assert controller._dock is not None
 first_dock = controller._dock
 controller.open_action.trigger()
 assert controller._dock is first_dock
+assert first_dock.record_button.text() == 'Stop recording'
+first_dock.catalog_button.click()
+assert first_dock.pages.currentIndex() == 1
+first_dock.stream_button.click()
+assert first_dock.pages.currentIndex() == 0
 controller.patcher.muted.add('gui.media_sync_did_progress')
 assert mw.addonManager.config.get('muted_hooks') is None
 first_dock.refresh()
@@ -62,8 +68,9 @@ gui_hooks.debug_console_will_show(console)
 anki.hooks.note_will_flush('test')
 controller._flush(console, controller._timers[0])
 assert 'anki.note_will_flush' in console._log.toPlainText()
-controller.action.setChecked(False)
+first_dock.record_button.click()
 assert not controller.patcher.recording
+assert first_dock.record_button.text() == 'Start recording'
 before = len(controller.recorder.snapshot())
 anki.hooks.note_will_flush('paused')
 assert len(controller.recorder.snapshot()) == before
@@ -82,6 +89,11 @@ assert not paused.patcher.recording
 assert paused.patcher.muted == {'anki.note_will_flush'}
 assert not paused.config.trace_legacy
 assert 'unsupported' in paused.config_warnings[0]
+paused.open_action.trigger()
+assert paused._dock.record_button.text() == 'Start recording'
+paused._dock.record_button.click()
+assert paused.patcher.recording
+assert paused._dock.record_button.text() == 'Stop recording'
 hook_tracer.stop()
 """
     result = subprocess.run(
